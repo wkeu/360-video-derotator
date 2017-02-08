@@ -1,6 +1,12 @@
 
+import math
+from PIL import Image
+
 width=640
 height=320
+
+x=320
+y=160
 
 xx = 2*(x+0.5) / width - 1.0
 yy = 2*(y+0.5)/ height - 1.0
