@@ -32,12 +32,13 @@ for y in xrange(height):
         lng = math.atan2(Y, X)
 
         #ix and iy must be integers
+        #location frame will be moved
         ix = int((0.5 * lng / math.pi + 0.5) * width - 0.5)
         iy = int((lat/math.pi + 0.5) * height  - 0.5)
 
         #not sure of this part to remap the image
-        newpixel = pixel[ix, iy]
+        newpixel = pixel[x, y]
         img2.putpixel([x, y], newpixel)
         #I tries as mentionned in the following code to invert x and y in the two previous lines but the index error out of range comes back 
 
-img2.save("rotated__"+fname)
+img2.save("rotated_"+fname)
