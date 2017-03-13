@@ -13,15 +13,15 @@ from formula import *
 import math
 from PIL import Image
 
-theta_U=(3*np.pi/2)
+theta_U=(np.pi/4)
 
 Ux=np.matrix([ [1, 0, 0] , [0, np.cos(theta_U), -np.sin(theta_U)] , [0, np.sin(theta_U), np.cos(theta_U)] ])
 Uy=np.matrix([ [np.cos(theta_U), 0, np.sin(theta_U)] , [0, 1, 0] , [-np.sin(theta_U), 0, np.cos(theta_U)] ])
 Uz=np.matrix([ [np.cos(theta_U), -np.sin(theta_U), 0] , [np.sin(theta_U), np.cos(theta_U), 0] , [ 0, 0, 1] ])
 
-U=Ux
+U=Uy
 
-fname="world_map2.png"
+fname="frame_1_low_res.png"
 f1=open("logfile_pixel.txt","w")
 f2=open("logfile_sphere_cart_conversion.txt","w")
 
@@ -75,9 +75,10 @@ for y_map in xrange(height):
             f2.write("Lat:"+str(float(lat))+" ULat:"+str(float(lat_U))+"\nLng:"+str(float(lng))+" ULng:"+str(float(lng_U))+ "\n")
             print("Finished point x:"+str(x_map)+ " ix:" +str(ix) +" y:"+str(y_map) + " iy:" + str(iy)+ "\n")
          
-img2.save("05_test_rotated_"+fname)
+img2.save("Obtained_via_rotational_matrix"+fname)
 
 print("Finished o.O.o")
-f.close() #close the logfile
+f1.close() #close the logfile
+f2.close()
 
 
