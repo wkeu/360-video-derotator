@@ -411,11 +411,11 @@ Quater: RMSD after coordinates are translated and rotated using quaternions.
         p_all = np.dot(p_all, U)
         write_coordinates(p_atoms, p_all, title="{} translated".format(args.structure_a))
         quit()
-        
-    U = kabsch(P, Q)
-    print(U)
     
+    U = kabsch(P, Q)
 
     print "Normal RMSD:", normal_rmsd
     print "Kabsch RMSD:", kabsch_rmsd(P, Q)
     print "Quater RMSD:", quaternion_rmsd(P, Q)
+    np.savetxt('rotation_matrix', U)
+    print(U)

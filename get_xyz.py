@@ -7,15 +7,18 @@ Created on Mon Feb 06 15:08:06 2017
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
+from formula import *
 
-NUMBER_OF_POINTS=40
+NUMBER_OF_POINTS=40 #Tested number which give good results
 
-img1 = cv2.imread('frame_0_low_res.png',0) # Frame0 (query image)
-img2 = cv2.imread('frame_1_low_res.png',0) # Frame1 (train image)
+fname1='world_map2.png'
+fname2='world_map2.png'
 
-#sanity check to ensure images are read in correctly
-#cv2.imshow('img1',img1)
-#cv2.imshow('img2',img2)
+#Read in the frames
+img1 = cv2.imread(fname1,0) # Frame0 (query image)
+img2 = cv2.imread(fname2,0) # Frame1 (train image)
+
+height, width = img1.shape
 
 # Initiate SIFT detector
 orb = cv2.ORB_create() #Needed to be fixed
@@ -50,12 +53,13 @@ matches = sorted(matches, key = lambda x:x.distance)
 """
 Sanity Check
 # Draw first 10 matches.
-img3 = cv2.drawMatches(img1,kp1,img2,kp2,matches[:10],None, flags=2)
-
-cv2.imshow("Matched Image",img3)
-
-cv2.imwrite("Matched_Image_low_res.png",img3)
 """
+img3 = cv2.drawMatches(img1,kp1,img2,kp2,matches[:2],None, flags=2)
+
+#cv2.imshow("Matched Image",img3)
+
+cv2.imwrite("Matched"+fname2,img3)
+
 
 """
 Isolating the x,y (long,lat from the image) 
@@ -102,8 +106,12 @@ Converting the xy, to equivilent cartisian to gain point cloud
 """
 #deal with F0_pionts and F1_pionts seperatly
 
-y_poi = F1_points[1].astype(int)
-x_poi = F1_points[0].astype(int)
+y_poi_0 = F0_points[1].astype(int)
+x_poi_0 = F0_points[0].astype(int)
+
+y_poi_1 = F1_points[1].astype(int)
+x_poi_1 = F1_points[0].astype(int)
+
 
 # coordinates of the image - don't know if this is entirely accurate, but probably close
 lats = np.linspace(-180, 180, img1.shape[1]) * np.pi/180            # Create Long axis
@@ -115,30 +123,61 @@ lons = np.linspace(-90, 90, img1.shape[0])[::-1] * np.pi/180        # Create Lat
 #point of intrest used as an example 
 #poi = [lats[4],lons[576]]
 
+"""
+
 # repeat code from one of the examples linked to in the question, except for specifying facecolors:
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
 #convert long and lat to x and y
+"""
+#cart2sph(x,y,z):
 
-x = np.cos(lats[x_poi]) * np.cos(lons[y_poi])
-y = np.cos(lats[x_poi]) * np.sin(lons[y_poi])
-z = np.sin(lats[x_poi])
+#sph2cart(r,theta,phi):
 
+x_0 = np.cos(lats[x_poi_0]) * np.cos(lons[y_poi_0])
+y_0 = np.cos(lats[x_poi_0]) * np.sin(lons[y_poi_0])
+z_0 = np.sin(lats[x_poi_0])
+
+x_1 = np.cos(lats[x_poi_1]) * np.cos(lons[y_poi_1])
+y_1 = np.cos(lats[x_poi_1]) * np.sin(lons[y_poi_1])
+z_1 = np.sin(lats[x_poi_1])
+
+
+xx_0 = 2*(x_poi_0+0.01) / width - 1.0 #0.01 is to prevent case where 
+yy_0 = 2*(y_poi_0+0.01)/ height - 1.0
+lng_0 = np.pi * xx_0
+lat_0 = - 0.5 * np.pi * yy_0
+        
+#phi=lat tetha=lng sph2cart(r,theta,phi)
+x_cart_0,y_cart_0,z_cart_0=sph2cart(1,lat_0,lng_0)
+        
+#This snippet of code should be refactored
+xx_1 = 2*(x_poi_1+0.01) / width - 1.0 #0.01 is to prevent case where 0 below the line
+yy_1 = 2*(y_poi_1+0.01)/ height - 1.0
+lng_1 = np.pi * xx_1
+lat_1 = - 0.5 * np.pi * yy_1
+        
+#phi=lat tetha=lng sph2cart(r,theta,phi)
+x_cart_1,y_cart_1,z_cart_1=sph2cart(1,lat_1,lng_1)
 
 #Plot the point(s)
-ax.scatter(x, y, z, c='g',marker='o')
+#ax.scatter(x, y, z, c='g',marker='o')
 
 #Set axes range 
-ax.set_xlim3d(-1, 1)
-ax.set_ylim3d(-1, 1)
-ax.set_zlim3d(-1, 1)
+#ax.set_xlim3d(-1, 1)
+#ax.set_ylim3d(-1, 1)
+#ax.set_zlim3d(-1, 1)
 
 plt.show()
+"""
 
 #Exporting as an xyz file. 
 #Currently just running twice. Code should be refactored so it works for both quite easily
 """
-xyz=np.column_stack((x,y,z))
-np.savetxt('frame_1.xyz', xyz)
-"""
+xyz_0=np.column_stack((x_cart_0,y_cart_0,z_cart_0))
+xyz_1=np.column_stack((x_cart_1,y_cart_1,z_cart_1))
+np.savetxt('frame_0.xyz', xyz_0)
+np.savetxt('frame_1.xyz', xyz_1)
+
+print("Point Clouds Retrieved")

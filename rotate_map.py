@@ -6,79 +6,82 @@ Created on Wed Mar 01 14:36:37 2017
 """
 
 import numpy as np
-import math as m
 from formula import *
-  
-
-import math
+import timeit
 from PIL import Image
+import matplotlib.pyplot as plt
 
-theta_U=(np.pi/4)
+start = timeit.default_timer() #Timer for benchmarking
 
+theta_U=(3*np.pi/2)   #Set rotation angle
+
+#Rotation matrices for each axis
 Ux=np.matrix([ [1, 0, 0] , [0, np.cos(theta_U), -np.sin(theta_U)] , [0, np.sin(theta_U), np.cos(theta_U)] ])
 Uy=np.matrix([ [np.cos(theta_U), 0, np.sin(theta_U)] , [0, 1, 0] , [-np.sin(theta_U), 0, np.cos(theta_U)] ])
 Uz=np.matrix([ [np.cos(theta_U), -np.sin(theta_U), 0] , [np.sin(theta_U), np.cos(theta_U), 0] , [ 0, 0, 1] ])
 
-U=Uy
+U=Uz  #Rotational Matrix
 
+#file to rotate
 fname="frame_1_low_res.png"
-f1=open("logfile_pixel.txt","w")
-f2=open("logfile_sphere_cart_conversion.txt","w")
 
+#Load Image
 img = Image.open(fname)
 img = img.convert('RGB')
 pixel = img.load()
 width, height = img.size
 
-
+#x_map=np.arange(0,width)
 img2 = img.copy()
+
+#Create x,y axes corisponding to the image
+x_map=np.matrix(np.arange(0,width)) 
+y_map=np.matrix(np.arange(0,height)) 
+
+#Create long and lat axes based on image
+xx = 2*(x_map+0.01) / width - 1.0 #0.01 to prevent denominator of 0
+yy = 2*(y_map+0.01)/ height - 1.0
+lng = np.pi * xx
+lat = - 0.5 * np.pi * yy
+
+#Duplicate axes for every cordinate. Needed for element by element operators
+lng=np.repeat(lng.T,height,axis=1)
+lat=np.repeat(lat,width,axis=0)
+        
+#Convert spherical cordinate to cart
+x_cart,y_cart,z_cart=arraysph2cart(1,lat,lng)
+
+#apply matrix multiplication
+x_U,y_U,z_U=arraymatrix_multiplication(U,x_cart,y_cart,z_cart)
+        
+#Convert cart cordinates to spherical
+r_U, lat_U, lng_U=arraycart2sph(x_U,y_U,z_U)
+        
+#Convert long and lat (sperical) to image pixel location
+ix = np.rint((0.5 * lng_U / np.pi + 0.5) * width - 0.5)
+iy = np.rint((-lat_U/np.pi + 0.5) * height  - 0.5)
+
+#If possible to vectorize this part of the code!! 
+#Moves each pixel to new location
 for y_map in xrange(height):
     for x_map in xrange(width):
-        xx = 2*(x_map+0.01) / width - 1.0 #0.01 is to prevent case where 
-        yy = 2*(y_map+0.01)/ height - 1.0
-        lng = math.pi * xx
-        lat = - 0.5 * math.pi * yy
-        
-        #phi=lat tetha=lng sph2cart(r,theta,phi)
-        x_cart,y_cart,z_cart=sph2cart(1,lat,lng)
-        
-        #Apply roation
-        pt_cart=np.matrix([ [x_cart] , [y_cart], [z_cart] ])
+        newpixel = pixel[ix[x_map,y_map], iy[x_map,y_map]]
+        img2.putpixel([x_map, y_map], newpixel)      
 
-        pt_cart_U=np.matmul(U, pt_cart)
-
-        x_U = pt_cart_U[0]
-        y_U = pt_cart_U[1]
-        z_U = pt_cart_U[2]
-        
-        #r,theta,phi
-        r_U, lat_U, lng_U=cart2sph(x_U,y_U,z_U)
-        
-        #ix and iy must be integers
-        #location frame will be moved
-        ix = int((0.5 * lng_U / math.pi + 0.5) * width - 0.5)
-        iy = int(round((-lat_U/math.pi + 0.5) * height  - 0.5))
-
-        #Prevents the image from being out of bounds
-        if iy>=height:
-            iy=height-1
-            
-        if ix>=width:
-            ix=width-1
-            
-        newpixel = pixel[ix, iy]
-        img2.putpixel([x_map, y_map], newpixel)
-        #I tries as mentionned in the following code to invert x and y in the two previous lines but the index error out of range comes back 
-        
-        if(x_map%20==0):
-            f1.write("Finished point x:"+str(x_map)+ " ix:" +str(ix) +" y:"+str(y_map) + " iy:" + str(iy)+ "\n")
-            f2.write("Lat:"+str(float(lat))+" ULat:"+str(float(lat_U))+"\nLng:"+str(float(lng))+" ULng:"+str(float(lng_U))+ "\n")
-            print("Finished point x:"+str(x_map)+ " ix:" +str(ix) +" y:"+str(y_map) + " iy:" + str(iy)+ "\n")
-         
-img2.save("Obtained_via_rotational_matrix"+fname)
-
+#save result
+img2.save("After_rotation_"+fname)
 print("Finished o.O.o")
-f1.close() #close the logfile
-f2.close()
 
+#Calculate Runtime
+stop = timeit.default_timer()
+total_time = stop - start
 
+print("Run time:"+str(total_time))
+
+"""
+Heat_map 
+plt.imshow(x_map.T, cmap='Blues', interpolation='nearest')
+plt.colorbar()
+plt.show()
+plt.savefig('x_map_heat_map.png', dpi=500)
+"""
