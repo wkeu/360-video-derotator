@@ -9,8 +9,9 @@ import cv2
 from matplotlib import pyplot as plt
 from formula import *
 
+
 def obtain_point_cloud(query_image,train_image):
-    NUMBER_OF_POINTS=40 #Tested number which give good results
+    NUMBER_OF_POINTS=100 #Tested number which give good results
 
     #Read in the frames
     img1 = query_image # Frame0 (query image)
@@ -26,16 +27,23 @@ def obtain_point_cloud(query_image,train_image):
     kp2, des2 = orb.detectAndCompute(img2,None)
 
     # create BFMatcher object
-    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
     
     # Match descriptors.
-    matches = bf.match(des1,des2)
+    matches = bf.knnMatch(des1,des2,k=2)
 
     # Sort them in the order of their distance.
     #Note this might only be apropriate for removing translational motion. But will work for now
-    matches = sorted(matches, key = lambda x:x.distance)
+    #matches = sorted(matches, key = lambda dmatch: dmatch.distance)
 
 
+    good = []
+    for m,n in matches:
+        if m.distance < 0.75*n.distance:
+            good.append([m])
+    
+    matches=good
+    
     """
     Isolating the x,y (long,lat from the image) 
     """
@@ -45,8 +53,8 @@ def obtain_point_cloud(query_image,train_image):
 
     #Messy essentially getting cordinates
     #Get index
-    a=points[count].queryIdx #F0
-    b=points[count].trainIdx #F1
+    a=points[count][count].queryIdx #F0
+    b=points[count][count].trainIdx #F1
 
     #Get point
     c=kp1[a].pt #query FO
@@ -59,8 +67,8 @@ def obtain_point_cloud(query_image,train_image):
 
     while count < NUMBER_OF_POINTS:
     
-        a=points[count].queryIdx #F0
-        b=points[count].trainIdx #F1
+        a=points[count][0].queryIdx #F0
+        b=points[count][0].trainIdx #F1
 
         #Get point    
         c=kp1[a].pt #query FO
@@ -71,22 +79,16 @@ def obtain_point_cloud(query_image,train_image):
     
         count += 1
 
-    #Sanity Check
-    #results should be quite close and the points can be inspected
-    F_diff=F1_points-F0_points
-
- 
-
     """
     Converting the xy, to equivilent cartisian to gain point cloud
     """
     #deal with F0_pionts and F1_pionts seperatly
 
-    y_poi_0 = F0_points[1].astype(int)
-    x_poi_0 = F0_points[0].astype(int)
+    y_poi_0 = F0_points[1]
+    x_poi_0 = F0_points[0]
 
-    y_poi_1 = F1_points[1].astype(int)
-    x_poi_1 = F1_points[0].astype(int)
+    y_poi_1 = F1_points[1]
+    x_poi_1 = F1_points[0]
 
 
     xx_0 = 2*(x_poi_0+0.01) / width - 1.0 #0.01 is to prevent case where 

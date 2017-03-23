@@ -12,13 +12,14 @@ import cv2
 import numpy as np
 from get_xyz import *
 from calculate_rmsd import *
+from rotate_map import *
 
 ###############################################################################
 # Obtain Rotations
 ###############################################################################
 #Import Video
-fname="MerryGoRound_high_res.mp4"
-fout="kabsch_tq.avi"
+fname="MerryGoRound_3sec.mp4"
+fout="test4.avi"
 cap = cv2.VideoCapture(fname) #Open Video File, from current directory
 
 #Obtain Rotation Matrices
