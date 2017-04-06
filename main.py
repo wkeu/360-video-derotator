@@ -13,10 +13,14 @@ import numpy as np
 from get_xyz import *
 from calculate_rmsd import *
 from rotate_map import *
+import timeit
 
 ###############################################################################
 # Obtain Rotations
 ###############################################################################
+start = timeit.default_timer()
+
+
 #Import Video
 fname="MerryGoRound_3sec.mp4"
 fout="test4.avi"
@@ -24,7 +28,7 @@ cap = cv2.VideoCapture(fname) #Open Video File, from current directory
 
 #Obtain Rotation Matrices
 #Using Train and Query image. Query behind train ie Query=frame_n-1,train=frame_n
- 
+
 #Initial setup for loop
 ret, train = cap.read()
 U_stream=list()
@@ -63,6 +67,8 @@ for n in range(1,n_frames):
 
 print("o.O.o\nRotational Matrices Accumulated")
 
+midway = timeit.default_timer()
+
 ###############################################################################
 #Derotation of frames
 ###############################################################################
@@ -97,7 +103,15 @@ while(cap.isOpened()):
 cap.release()
 out.release()
 
+stop = timeit.default_timer()
+ 
+
+print("Half:"+str(midway - start))
+print("Overall:"+str(stop - start))
+
 print("o.O.o\nStabilised Video Outputed")
+
+
 
 """
 Trobleshooting
