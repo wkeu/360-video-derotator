@@ -10,8 +10,8 @@ from matplotlib import pyplot as plt
 from formula import *
 
 
-def obtain_point_cloud(query_image,train_image):
-    NUMBER_OF_POINTS=100 #Tested number which give good results
+def obtain_point_cloud(query_image,train_image,NUMBER_OF_POINTS=50):
+    #NUMBER_OF_POINTS=50#Tested number which give good results
 
     #Read in the frames
     img1 = query_image # Frame0 (query image)
@@ -26,24 +26,38 @@ def obtain_point_cloud(query_image,train_image):
     kp1, des1 = orb.detectAndCompute(img1,None)
     kp2, des2 = orb.detectAndCompute(img2,None)
 
+    """
     # create BFMatcher object
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
     
     # Match descriptors.
     matches = bf.knnMatch(des1,des2,k=2)
-
+    """
     # Sort them in the order of their distance.
     #Note this might only be apropriate for removing translational motion. But will work for now
     #matches = sorted(matches, key = lambda dmatch: dmatch.distance)
 
-
+    """
     good = []
     for m,n in matches:
-        if m.distance < 0.75*n.distance:
+        if m.distance < 0.90*n.distance:
             good.append([m])
+            
+            
     
     matches=good
-    
+    """
+    # create BFMatcher object
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+ 
+    # Match descriptors.
+    matches = bf.match(des1,des2)
+ 
+    # Sort them in the order of their distance.
+    #Note this might only be apropriate for removing translational motion. But will work for now
+    matches = sorted(matches, key = lambda x:x.distance)
+ 
+    #print("number of  matches obtained"+str(len(matches)))
     """
     Isolating the x,y (long,lat from the image) 
     """
@@ -53,8 +67,8 @@ def obtain_point_cloud(query_image,train_image):
 
     #Messy essentially getting cordinates
     #Get index
-    a=points[count][count].queryIdx #F0
-    b=points[count][count].trainIdx #F1
+    a=points[count].queryIdx #F0
+    b=points[count].trainIdx #F1
 
     #Get point
     c=kp1[a].pt #query FO
@@ -67,8 +81,8 @@ def obtain_point_cloud(query_image,train_image):
 
     while count < NUMBER_OF_POINTS:
     
-        a=points[count][0].queryIdx #F0
-        b=points[count][0].trainIdx #F1
+        a=points[count].queryIdx #F0
+        b=points[count].trainIdx #F1
 
         #Get point    
         c=kp1[a].pt #query FO

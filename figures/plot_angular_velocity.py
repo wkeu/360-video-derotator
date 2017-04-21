@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Mar 16 16:56:30 2017
+Created on Sun Apr 09 17:30:57 2017
 
 @author: temp2015
 """
-
-
-
 
 import cv2
 import numpy as np
@@ -19,11 +16,10 @@ import timeit
 # Obtain Rotations
 ###############################################################################
 start = timeit.default_timer()
-
+#gh
 
 #Import Video
-fname="MerryGoRound_3sec.mp4"
-fout="test4.avi"
+fname="spin_clip_2.mp4"
 cap = cv2.VideoCapture(fname) #Open Video File, from current directory
 
 #Obtain Rotation Matrices
@@ -67,56 +63,61 @@ for n in range(1,n_frames):
 
 print("o.O.o\nRotational Matrices Accumulated")
 
-midway = timeit.default_timer()
+start_point= np.array([0,1,0])
+point_position=np.zeros([len(U_stream_acumilated),3])
 
-###############################################################################
-#Derotation of frames
-###############################################################################
+point_position[0,0]=start_point[0]
+point_position[0,1]=start_point[1]
+point_position[0,2]=start_point[2]
 
-cap = cv2.VideoCapture(fname) #Open Video File, from current directory
+#concatinate
+for i in range(1,len(U_stream_acumilated)): 
+    x,y,z = arraymatrix_multiplication( U_stream_acumilated[i-1],start_point[0],start_point[1],start_point[2])
 
-#Open Output file
-#Initial setup for loop, initial frame can be left as is
-ret, frame_n = cap.read()
-
-fourcc = cv2.VideoWriter_fourcc(*"XVID")
-out_fps=10
-out=cv2.VideoWriter(fout,fourcc,out_fps,(int(frame_n.shape[1]),int(frame_n.shape[0]))) #make sure the dimensions are the same size as input data 
-
-#Write out initial unchanged frame
-out.write(frame_n)
-n=0
-
-while(cap.isOpened()):
+    point_position[i,0]=x
+    point_position[i,1]=y
+    point_position[i,2]=z
     
-    ret, frame_n = cap.read()
-    
-    if ret==False:
-        break
-   
-    frame_stabilized=rotate_map(frame_n,U_stream_acumilated[n])
-    n+=1
-    
-    out.write(frame_stabilized)
-    print("frame" +str(n)+"completed")
-    
-cap.release()
-out.release()
+#for i in U_stream_acumilated:
 
-stop = timeit.default_timer()
- 
+#plot
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-print("Half:"+str(midway - start))
-print("Overall:"+str(stop - start))
+fps=30
 
-print("o.O.o\nStabilised Video Outputed")
+time=np.arange(0.0,float(len(U_stream_acumilated)/fps),(1/float(fps)))
+
+fig = plt.figure()
+
+plt.plot(time,point_position[0:180,0])
+
+# Two subplots, the axes array is 1-d
+ax1 = plt.subplot(311)
+ax1.scatter([1, 2], [3, 4])
+ax1.set_xlim([0, 5])
+ax1.set_ylim([0, 5])
 
 
+ax2 = plt.subplot(312)
+ax2.scatter([1, 2],[3, 4])
+ax2.set_xlim([0, 5])
+ax2.set_ylim([0, 5])
 
-"""
-Trobleshooting
-theta_U=(np.pi/2)   #Set rotation angle
+f, axarr = plt.subplots(3, sharex=True,facecolor='White')
+axarr[0].plot(time,point_position[0:180,0],label="x axis")
+axarr[0].set_title('X axis')
+axarr[0].set_ylim([-1.1,1.1])
+axarr[0].yaxis.set_ticks(np.arange(-1, 1.1, 1))
+axarr[1].plot(time,point_position[0:180,1],c='g',label="y axis")
+axarr[1].set_ylim([-1.1,1.1])
+axarr[1].yaxis.set_ticks(np.arange(-1, 1.1, 1))
+axarr[1].set_title('Y axis')
+axarr[2].plot(time,point_position[0:180,2],c='r',label="z axis")
+axarr[2].set_ylim([-1.1,1.1])
+axarr[2].yaxis.set_ticks(np.arange(-1, 1.1, 1))
+axarr[2].set_title('Z axis')
+axarr[2].set_xlabel("time (seconds)")
+plt.savefig("angular_velocity_over_time_axis.png",dpi=500)
 
-#Rotation matrices for each axis
-U=np.matrix([ [np.cos(theta_U), -np.sin(theta_U), 0] , [np.sin(theta_U), np.cos(theta_U), 0] , [ 0, 0, 1] ])
-"""
+
