@@ -36,7 +36,7 @@ For more comprehensive details about the methodology please refer to the followi
 - Maters Thesis ([link](https://drive.google.com/file/d/1C_PAVe0sNiquvzk1Aolnvb1vl0BBU330/view?usp=sharing))
 
 ## Future Works
-The following are items which are required to move the repository A TODO section at the end so that if anyone wants to use the code they can. Improvements to methodology, .
+The following are items which are required to improve the quality of the repository. The small ticket items won't affect the performance of the algorithm but will make the repository more maintainable and user friendly. The big ticket items will require more work but will significantly improve the results and performance of the algorithm.  
 
 ### TODO (Small Ticket)
 - [ ] Refactoring of main.py, get_xyz.py and rotate_map.py. They require modularisation to break the code up into more managble/readable functions.
@@ -49,3 +49,4 @@ The following are items which are required to move the repository A TODO section
 ### TODO (Big Ticket)
 - [ ] Porting to C#/C++. Specifically the image rotational functions as they are computationally heavy.
 - [ ] Change software architecture to obtian rotational matrix from heavily downsampled video.
+- [ ] Add scope for parallel computing to rotate multiple frames at the same time.
