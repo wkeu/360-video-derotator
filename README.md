@@ -16,7 +16,7 @@ Note that the following packages are required/reccomended in order to use the di
 
 The algorithm was built and tested using windows 10 but it should work on either Linux or MacOS. The test footage we obtained was from using the lg 360 camera.
 
-## Hot to use
+## How to use
 1. In order to use the package first download the repo. 
 2. Set up your enviroment with the required packages as specified above. 
 3. Edit the parameter *fname="path_to_raw_video.mp4"* in the file main.py.
