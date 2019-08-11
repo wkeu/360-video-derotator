@@ -17,6 +17,13 @@ from calculate_rmsd import *
 from rotate_map import *
 import timeit
 
+
+#TODO: remove the timer. 
+#TODO: Aadd functionality to allow people to input their own video into the script. Easy enough to do
+#       add a line where the person can put in their own directory. 
+
+
+
 ###############################################################################
 # Obtain Rotations
 ###############################################################################
@@ -25,7 +32,7 @@ start = timeit.default_timer()
 
 #Import Video
 fname="test1_raw_initial_test.mp4"
-fout="test1_derotated_initial_test.avi"
+fout="derotated_footage.avi"
 cap = cv2.VideoCapture(fname) #Open Video File, from current directory
 out_fps=30
 
