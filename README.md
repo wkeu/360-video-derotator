@@ -39,13 +39,13 @@ For more comprehensive details about the methodology please refer to the followi
 The following are items which are required to move the repository A TODO section at the end so that if anyone wants to use the code they can. Improvements to methodology, .
 
 ### TODO (Small Ticket)
-- [] Refactoring of main.py, get_xyz.py and rotate_map.py. They require modularisation to break the code up into more managble/readable functions.
-- [] Renaming of functions to have intuative and consisten naming.  
-- [] Addition of TODO: for areas which can be improved.  
-- [] Removal of unused functions present in the code. 
-- [] Improve functionality for outputting video in .mp4 format. 
-- [] Add functionality for inputing raw video file directory into script via the command line. 
+- [ ] Refactoring of main.py, get_xyz.py and rotate_map.py. They require modularisation to break the code up into more managble/readable functions.
+- [ ] Renaming of functions to have intuative and consisten naming.  
+- [ ] Addition of TODO: for areas which can be improved.  
+- [ ] Removal of unused functions present in the code. 
+- [ ] Improve functionality for outputting video in .mp4 format. 
+- [ ] Add functionality for inputing raw video file directory into script via the command line. 
 
 ### TODO (Big Ticket)
-- [] Porting to C#/C++. Specifically the image rotational functions as they are computationally heavy.
-- [] Change software architecture to obtian rotational matrix from heavily downsampled video.
+- [ ] Porting to C#/C++. Specifically the image rotational functions as they are computationally heavy.
+- [ ] Change software architecture to obtian rotational matrix from heavily downsampled video.
