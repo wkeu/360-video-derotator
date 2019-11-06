@@ -32,7 +32,7 @@ It is possible to experiment with the results of the video by varying the number
 The methodology uses a rotationally-invariant algorithm to obtain feature points and descriptors for pairs of successive frames. This information is then abstracted into three-dimensional point clouds, from which the Kabsch algorithm can infer the rotational motion between frames. The resulting rotational matrices are used to remap each equirectangular frame to a reference frame, and thereby offset the effect of frame-to-frame camera rotations.
 
 For more comprehensive details about the methodology please refer to the following:  
-- IEEECON 2019 Publication ( Link pending presentation )
+- IEEECON 2019 Publication (([link](https://researchrepository.ucd.ie/handle/10197/10985)) )
 - Maters Thesis ([link](https://drive.google.com/file/d/1C_PAVe0sNiquvzk1Aolnvb1vl0BBU330/view?usp=sharing))
 
 ## Future Works
